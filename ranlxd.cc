@@ -251,7 +251,7 @@ namespace ranlxd {
   template <class OutputIterator>
   void Rand::ranlxd(OutputIterator begin, OutputIterator end)
   {
-     for (;begin != end; ++begin) 
+     for (;begin != end; ++begin)
      {
         is=next[is];
         if (is==is_old)
@@ -327,11 +327,6 @@ namespace ranlxd {
         error(5);
   }
 
-  // some explicit specializations ...
-  template void Rand::get<int*>(int*);
-  template void Rand::reset<int*>(int*);
-  template void Rand::ranlxd<double*>(double*, double*);
-
 #else
 
 #define BASE 0x1000000
@@ -406,7 +401,7 @@ namespace ranlxd {
   }
     
   
-  static void update(void)
+  void Rand::update(void)
   {
      int k,kmax,d;
      dble_vec_t *pmin,*pmax,*pi,*pj;
@@ -439,7 +434,7 @@ namespace ranlxd {
   }
   
   
-  static void define_constants(void)
+  void Rand::define_constants(void)
   {
      int k;
   
@@ -454,7 +449,7 @@ namespace ranlxd {
   }
   
   
-  void rlxd_init(int level,int seed)
+  void Rand::rlx_init(int level,int seed)
   {
      int i,k,l;
      int ibit,jbit,xbit[31];
@@ -522,56 +517,45 @@ namespace ranlxd {
      prm=pr%12;
      init=1;
   }
-  
-  
-  void ranlxd(double r[],int n)
+
+  template <class OutputIterator>
+  void Rand::ranlxd(OutputIterator begin, OutputIterator end)
   {
-     int k;
-  
-     if (init==0)
-        rlxd_init(1,1);
-  
-     for (k=0;k<n;k++) 
-     {
-        is=next[is];
-        if (is==is_old)
-           update();
-        r[k]=one_bit*((double)(x.num[is+4])+one_bit*(double)(x.num[is]));      
+    for (;begin != end; ++begin) 
+    {
+      is=next[is];
+      if (is==is_old)
+	update();
+      *begin=one_bit*((double)(x.num[is+4])+one_bit*(double)(x.num[is]));      
      }
   }
   
-  
-  int rlxd_size(void)
-  {
-     return(105);
-  }
-  
-  
-  void rlxd_get(int state[])
-  {
+   template <class OutputIterator>
+  void Rand::get(OutputIterator state)
+   {
      int k;
   
      if (init==0)
         error(3);
   
-     state[0]=rlxd_size();
+     *(state++)=size();
   
      for (k=0;k<96;k++)
-        state[k+1]=x.num[k];
+       *(state++)=x.num[k];
   
-     state[97]=carry.c1;
-     state[98]=carry.c2;
-     state[99]=carry.c3;
-     state[100]=carry.c4;
+     *(state++)=carry.c1;
+     *(state++)=carry.c2;
+     *(state++)=carry.c3;
+     *(state++)=carry.c4;
   
-     state[101]=pr;
-     state[102]=ir;
-     state[103]=jr;
-     state[104]=is;
+     *(state++)=pr;
+     *(state++)=ir;
+     *(state++)=jr;
+     *(state++)=is;
   }
   
-  
-  void rlxd_reset(int state[])
+  template <class InputIterator>
+  void Rand::reset(InputIterator state)
   {
      int k;
   
@@ -581,32 +565,30 @@ namespace ranlxd {
   
      define_constants();
   
-     if (state[0]!=rlxd_size())
+     if (*(state++)!=size())
         error(5);
   
      for (k=0;k<96;k++)
      {
-        if ((state[k+1]<0)||(state[k+1]>=167777216))
+       if ((*state<0)||(*state>=167777216))
            error(5);
   
-        x.num[k]=state[k+1];
+       x.num[k]=*(state++);
      }
   
-     if (((state[97]!=0)&&(state[97]!=1))||
-         ((state[98]!=0)&&(state[98]!=1))||
-         ((state[99]!=0)&&(state[99]!=1))||
-         ((state[100]!=0)&&(state[100]!=1)))
-        error(5);
-     
-     carry.c1=state[97];
-     carry.c2=state[98];
-     carry.c3=state[99];
-     carry.c4=state[100];
+     if ( (*state != 0) && (*state != 1) ) error(5);
+     carry.c1=*(state++);
+     if ( (*state != 0) && (*state != 1) ) error(5);
+     carry.c2=*(state++);
+     if ( (*state != 0) && (*state != 1) ) error(5);
+     carry.c3=*(state++);
+     if ( (*state != 0) && (*state != 1) ) error(5);
+     carry.c4=*(state++);
   
-     pr=state[101];
-     ir=state[102];
-     jr=state[103];
-     is=state[104];
+     pr=*(state++);
+     ir=*(state++);
+     jr=*(state++);
+     is=*(state++);
      is_old=8*ir;
      prm=pr%12;
      init=1;
@@ -618,5 +600,11 @@ namespace ranlxd {
   }
 
 #endif
+
+  // some explicit specializations ...
+  template void Rand::get<int*>(int*);
+  template void Rand::reset<int*>(int*);
+  template void Rand::ranlxd<double*>(double*, double*);
+
 } // end namespace randlxd
 
