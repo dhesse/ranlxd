@@ -20,7 +20,7 @@ namespace ranlxd {
 
   class Rand {
   public:
-    Rand (int level, int seed) { init(level, seed); }
+    Rand (int level, int seed) : init(1) { rlx_init(level, seed); }
     template <class OutputIterator>
     void ranlxd(OutputIterator begin, OutputIterator end);
     int size(void) { return 105; };
@@ -28,9 +28,9 @@ namespace ranlxd {
     template <class OutputIterator>
     void get(OutputIterator result);
     template <class InputIterator>
-    void reset(InputIterator begin, InputIterator end);
+    void reset(InputIterator begin);
   private:
-    void init(int level, int seed);
+    void rlx_init(int level, int seed);
     void define_constants(void);
     void update(void);
 #if (defined SSE)
@@ -44,7 +44,7 @@ namespace ranlxd {
       vec_t c1,c2;
     } dble_vec_t __attribute__ ((aligned (16)));
     
-    int init=0,pr,prm,ir,jr,is,is_old,next[96];
+    int init,pr,prm,ir,jr,is,is_old,next[96];
     vec_t one,one_bit,carry;
     
     union
@@ -63,7 +63,7 @@ namespace ranlxd {
       vec_t c1,c2;
     } dble_vec_t;
     
-    int init=0,pr,prm,ir,jr,is,is_old,next[96];
+    int init,pr,prm,ir,jr,is,is_old,next[96];
     double one_bit;
     vec_t carry;
     
@@ -73,6 +73,7 @@ namespace ranlxd {
       int num[96];
     } x;
 #endif
+  };
 }
 
 #endif

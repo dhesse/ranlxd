@@ -182,7 +182,7 @@ namespace ranlxd {
   }
   
   
-  void Rand::init(int level,int seed)
+  void Rand::rlx_init(int level,int seed)
   {
      int i,k,l;
      int ibit,jbit,xbit[31];
@@ -269,7 +269,7 @@ namespace ranlxd {
         error(3);
   
      base=(float)(ldexp(1.0,24));
-     *(state++)=rlxd_size();
+     *(state++)=size();
   
      for (k=0;k<96;k++)
        *(state++)=(int)(base*x.num[k]);
@@ -285,39 +285,37 @@ namespace ranlxd {
      *(state++)=is;
   }
   
-  
-  void rlxd_reset(int state[])
+  template <class InputIterator>
+  void Rand::reset(InputIterator state)
   {
      int k;
   
      define_constants();
   
-     if (state[0]!=rlxd_size())
+     if (*(state++)!=size())
         error(5);
   
      for (k=0;k<96;k++)
      {
-        if ((state[k+1]<0)||(state[k+1]>=167777216))
+        if ((*state<0)||(*state>=167777216))
            error(5);
   
-        x.num[k]=(float)(ldexp((double)(state[k+1]),-24));
+        x.num[k]=(float)(ldexp((double)(*(state++)),-24));
      }
   
-     if (((state[97]!=0)&&(state[97]!=1))||
-         ((state[98]!=0)&&(state[98]!=1))||
-         ((state[99]!=0)&&(state[99]!=1))||
-         ((state[100]!=0)&&(state[100]!=1)))
-        error(5);
-     
-     carry.c1=(float)(ldexp((double)(state[97]),-24));
-     carry.c2=(float)(ldexp((double)(state[98]),-24));
-     carry.c3=(float)(ldexp((double)(state[99]),-24));
-     carry.c4=(float)(ldexp((double)(state[100]),-24));
+     if ( (*state != 0) && (*state != 1) ) error(5);
+     carry.c1=(float)(ldexp((double)(*(state++)),-24));
+     if ( (*state != 0) && (*state != 1) ) error(5);
+     carry.c2=(float)(ldexp((double)(*(state++)),-24));
+     if ( (*state != 0) && (*state != 1) ) error(5);
+     carry.c3=(float)(ldexp((double)(*(state++)),-24));
+     if ( (*state != 0) && (*state != 1) ) error(5);
+     carry.c4=(float)(ldexp((double)(*(state++)),-24));
   
-     pr=state[101];
-     ir=state[102];
-     jr=state[103];
-     is=state[104];
+     pr=*(state++);
+     ir=*(state++);
+     jr=*(state++);
+     is=*(state++);
      is_old=8*ir;
      prm=pr%12;
      init=1;

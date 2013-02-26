@@ -25,14 +25,13 @@
 int main(void)
 {
    int k,test;
-   int *state;
    double base;
    double xd[NXD],yd[NXD],xdn[48];
 
    base=ldexp(1.0,48);
   
    ranlxd::Rand r(1,32767);
-   state=malloc(r.size()*sizeof(int));
+   int state[r.size()];
 
 /*******************************************************************************
 *
@@ -124,11 +123,11 @@ int main(void)
       r.ranlxd(xd,xd+NXD);
    }
 
-   rlxd_reset(state);
+   r.reset(state);
 
    for (k=0;k<10;k++)
    {
-      ranlxd(yd,yd+NXD);
+      r.ranlxd(yd,yd+NXD);
    }
 
    for (k=0;k<NXD;k++)
