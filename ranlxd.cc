@@ -45,6 +45,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <ranlxd.hpp>
 
 namespace ranlxd {
 
@@ -325,6 +326,11 @@ namespace ranlxd {
          (is<0)||(is>91))
         error(5);
   }
+
+  // some explicit specializations ...
+  template void Rand::get<int*>(int*);
+  template void Rand::reset<int*>(int*);
+  template void Rand::ranlxd<double*>(double*, double*);
 
 #else
 
