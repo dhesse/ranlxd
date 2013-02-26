@@ -20,7 +20,7 @@ namespace ranlxd {
 
   class Rand {
   public:
-    Rand (int level, int seed) : init(1) { rlx_init(level, seed); }
+    Rand (int seed, int level = 1) : init(1) { rlx_init(level, seed); }
     template <class OutputIterator>
     void ranlxd(OutputIterator begin, OutputIterator end);
     int size(void) { return 105; };
